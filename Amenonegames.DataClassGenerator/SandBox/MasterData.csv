@@ -1,0 +1,3 @@
+Speed,Damage,LifeTime,Health,Discription
+float,float,int,int,string
+1,2,4,8,テスト

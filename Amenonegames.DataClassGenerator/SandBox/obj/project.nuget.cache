@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "NzN2SOQFeeIXYufiQLhAh4ulW4xt7MzETM0WbLu2xvFAGAMERfYb1Jq0oxrZjfn0ATwfqX+JjWqUxvLXlTWOPA==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\tamed\\Documents\\project\\DataClassGenerater\\Amenonegames.DataClassGenerator\\SandBox\\SandBox.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\tamed\\.nuget\\packages\\microsoft.netcore.platforms\\1.1.0\\microsoft.netcore.platforms.1.1.0.nupkg.sha512",
+    "C:\\Users\\tamed\\.nuget\\packages\\netstandard.library\\2.0.3\\netstandard.library.2.0.3.nupkg.sha512"
+  ],
+  "logs": []
+}
