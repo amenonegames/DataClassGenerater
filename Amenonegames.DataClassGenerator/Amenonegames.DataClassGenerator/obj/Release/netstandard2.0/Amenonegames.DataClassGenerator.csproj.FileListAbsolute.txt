@@ -1,0 +1,10 @@
+C:\Users\tamed\Documents\project\DataClassGenerater\Amenonegames.DataClassGenerator\Amenonegames.DataClassGenerator\bin\Release\netstandard2.0\Amenonegames.DataClassGenerator.deps.json
+C:\Users\tamed\Documents\project\DataClassGenerater\Amenonegames.DataClassGenerator\Amenonegames.DataClassGenerator\bin\Release\netstandard2.0\Amenonegames.DataClassGenerator.dll
+C:\Users\tamed\Documents\project\DataClassGenerater\Amenonegames.DataClassGenerator\Amenonegames.DataClassGenerator\bin\Release\netstandard2.0\Amenonegames.DataClassGenerator.pdb
+C:\Users\tamed\Documents\project\DataClassGenerater\Amenonegames.DataClassGenerator\Amenonegames.DataClassGenerator\obj\Release\netstandard2.0\Amenonegames.DataClassGenerator.csproj.AssemblyReference.cache
+C:\Users\tamed\Documents\project\DataClassGenerater\Amenonegames.DataClassGenerator\Amenonegames.DataClassGenerator\obj\Release\netstandard2.0\Amenonegames.DataClassGenerator.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\tamed\Documents\project\DataClassGenerater\Amenonegames.DataClassGenerator\Amenonegames.DataClassGenerator\obj\Release\netstandard2.0\Amenonegames.DataClassGenerator.AssemblyInfoInputs.cache
+C:\Users\tamed\Documents\project\DataClassGenerater\Amenonegames.DataClassGenerator\Amenonegames.DataClassGenerator\obj\Release\netstandard2.0\Amenonegames.DataClassGenerator.AssemblyInfo.cs
+C:\Users\tamed\Documents\project\DataClassGenerater\Amenonegames.DataClassGenerator\Amenonegames.DataClassGenerator\obj\Release\netstandard2.0\Amenonegames.DataClassGenerator.csproj.CoreCompileInputs.cache
+C:\Users\tamed\Documents\project\DataClassGenerater\Amenonegames.DataClassGenerator\Amenonegames.DataClassGenerator\obj\Release\netstandard2.0\Amenonegames.DataClassGenerator.dll
+C:\Users\tamed\Documents\project\DataClassGenerater\Amenonegames.DataClassGenerator\Amenonegames.DataClassGenerator\obj\Release\netstandard2.0\Amenonegames.DataClassGenerator.pdb

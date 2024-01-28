@@ -6,6 +6,8 @@ namespace SandBox
     {
         public void Test()
         {
+            MasterData data;
+            TestMasterData data2;
             Console.WriteLine("Hello World!");
         }
     }
