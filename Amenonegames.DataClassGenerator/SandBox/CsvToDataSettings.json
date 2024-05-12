@@ -1,0 +1,11 @@
+[
+    {
+      "RootPath": "Amenonegames.DataClassGenerator/SandBox/CSV",
+      "CSVSeparator":",", 
+      "NameSpace": "Config",
+      "Serializable":false,
+      "InterfaceEnable": true,
+      "InterfaceName": "IConfig"
+    }
+]
+  

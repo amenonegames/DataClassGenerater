@@ -4,10 +4,9 @@
         <TargetFramework>netstandard2.0</TargetFramework>
     </PropertyGroup>
     <ItemGroup>
-        <AdditionalFiles Include="MasterData.csv" />
-        <AdditionalFiles Include="TestMasterData.csv" />
-        <ProjectReference Include="../Amenonegames.DataClassGenerator/Amenonegames.DataClassGenerator.csproj"
-                          OutputItemType="Analyzer"
-                          ReferenceOutputAssembly="false" />
+        <AdditionalFiles Include="CSVTest2/MasterData.csv" />
+        <AdditionalFiles Include="CSV/TestMasterData.csv" />
+        <AdditionalFiles Include="CsvToDataSettings.json" />
+        <ProjectReference Include="../Amenonegames.DataClassGenerator/Amenonegames.DataClassGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
     </ItemGroup>
 </Project>

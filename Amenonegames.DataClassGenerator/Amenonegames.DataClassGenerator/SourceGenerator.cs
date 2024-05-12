@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Text;
+using Amenonegames.SourceGenerator;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.DotnetRuntime.Extensions;
@@ -15,76 +16,145 @@ namespace DataClassGenerator
 
         public void Initialize(IncrementalGeneratorInitializationContext context)
         {
+            
 
-            var csvProvider = context.AdditionalTextsProvider
-                .Where(static file => file.Path.EndsWith(".csv"));
+            IncrementalValueProvider<ConfigData> configDataProvider = context.AdditionalTextsProvider.Where
+            (
+                static additionalText => additionalText.Path.EndsWith("CsvToDataSettings.json")
+            ).Select
+            (
+                static (configText,token) => new ConfigData( configText.GetText()!.ToString() )
+            ).Collect()
+            .Select( static (configs , token )=> configs.First());
 
-            var namesAndContents =
-                csvProvider
-                    .Select(
-                        static (text, cancellationToken) =>
+            var csvProvider = context.AdditionalTextsProvider.Where
+                (static additionalText => additionalText.Path.EndsWith(".csv"))
+                .Combine<AdditionalText,ConfigData>(configDataProvider);
+                
+            var dataProvider = csvProvider.Where
+                (
+                    static data =>
+                    {
+                        var (additionalText, config) = data;
+                        var path = additionalText.Path;
+                        var targets = config.Targets;
+                        if (targets != null)
                         {
-                            var name = Path.GetFileNameWithoutExtension(text.Path);
-                            var content = text.GetText(cancellationToken)!.ToString();
-                            
-                            StringReader reader = new StringReader(content);
-
-                            var firstLine = reader.ReadLine();
-                            var propertyNameClumns = firstLine.Split(',');
-                            string[] typeStr = new string[] { };
-                            while (reader.Peek() != -1)
+                            foreach (var target in targets)
                             {
-                                var line = reader.ReadLine();
-                                if (line != null)
+                                if (path.Contains(target.RootPath))
                                 {
-                                    var columns = line.Split(',');
-                                
-                                    if (IsNativeType(columns[0]))
-                                    {
-                                        typeStr = columns;
-                                        break;
-                                    }
+                                    return true;
                                 }
                             }
-                                
-                            return (name , propertyNameClumns , typeStr);
-                        })
-                    .Collect();
+                        }
+                        return false;
+                    }
+                )
+                .Select
+                (
+                    static (data,token) => new CsvInfo(data.Left,data.Right) 
+                ).Collect();
+            
             
             context.RegisterSourceOutput(
-                namesAndContents,
+                dataProvider,
                 static (sourceProductionContext, csvDataArray) =>
                 {
-                    var builder = new StringBuilder();
-                    foreach (var csvData in csvDataArray)
+                    var writer = new CodeWriter();
+                    
+                    var interfaceGrouped = csvDataArray.GroupBy( csvData => csvData.interfaceName);
+                    
+                    foreach (var groupedCsvData in interfaceGrouped)
                     {
-                        var (fileName,  propertyNameClumns ,  typeStr) = csvData;
-                        
-                        builder.Append($@"
-    public class {fileName}
-    {{");
-
-                        for (int i = 0; i < propertyNameClumns.Length; i++)
+                        foreach (var csvInfo in groupedCsvData)
                         {
-                            var propertyName = propertyNameClumns[i];
-                            var typeName = typeStr[i];
+                            if(!csvInfo.settingExist) continue;
                             
-                            builder.Append($@"
-        public {typeName} {propertyName} {{ get; set; }}");
+                            if (csvInfo.EnableNameSpace)
+                            {
+                                writer.AppendLine($"namespace {csvInfo.nameSpace}");
+                                writer.BeginBlock();
+                            }
+
+                            if (csvInfo.serializable)
+                            {
+                                writer.AppendLine($"[System.Serializable]");
+                            }
+                            writer.AppendLine( $"public partial class {csvInfo.fileName}" );
+
+                            if (csvInfo.requiredInterface)
+                            {
+                                writer.Append($": {csvInfo.interfaceName}");
+                            }
                             
+                            writer.AppendLine();
+                            writer.BeginBlock();
+                                
+                            for (var i = 0; i < csvInfo.PropertyInfos.Length; i++)
+                            {
+                                var propertyName = csvInfo.PropertyInfos[i].PropertyName;
+                                var type = csvInfo.PropertyInfos[i].TypeName;
+                                
+                                if (csvInfo.serializable)
+                                {
+                                    writer.AppendLine($"public {type} {propertyName} ");
+                                    writer.BeginBlock();
+                                    writer.AppendLine($"get {{return _{propertyName};}} ");
+                                    writer.AppendLine($"set {{_{propertyName} = value;}}"); 
+                                    writer.EndBlock();
+                                    writer.AppendLine($"[SerializeField]");
+                                    writer.AppendLine($"private {type} _{propertyName};");
+                                }
+                                else writer.AppendLine($"public {type} {propertyName} {{ get; set;}}");
+                                
+                            }
+                            
+                            writer.EndBlock();
+                            
+                            if (csvInfo.EnableNameSpace)
+                            {
+                                writer.EndBlock();
+                            }
+                            
+                            sourceProductionContext.AddSource($"{csvInfo.fileName}.g.cs", SourceText.From(writer.ToString(), Encoding.UTF8));
+                            writer.Clear();
+                        }
+
+                        var interfaceName = groupedCsvData.Key;
+                        if(interfaceName == string.Empty) continue;
+                        
+                        var csvInfoSample = groupedCsvData.First();
+                        if( !csvInfoSample.requiredInterface) continue;  
+                        if( csvInfoSample.settingExist == false) continue;
+                        
+                        var interfacePropertyName = groupedCsvData
+                            .Select(info => info.PropertyInfos.AsEnumerable())
+                            .Aggregate((current, next) => current.Intersect(next));
+                        
+                        if (csvInfoSample.EnableNameSpace)
+                        {
+                            writer.AppendLine($"namespace {csvInfoSample.nameSpace}");
+                            writer.BeginBlock();
+                        }
+                        writer.AppendLine( $"public partial interface {interfaceName}" );
+                        writer.BeginBlock();
+                        
+                        foreach (var propertyInfo in interfacePropertyName)
+                        {
+                            writer.AppendLine($"{propertyInfo.TypeName} {propertyInfo.PropertyName} {{ get; set;}}");
+                        }
+                        writer.EndBlock();
+                        
+                        if (csvInfoSample.EnableNameSpace)
+                        {
+                            writer.EndBlock();
                         }
                         
-                        builder.Append(@"
-    }");
-
-                        
-                        sourceProductionContext.AddSource($"{fileName}.g.cs", SourceText.From(builder.ToString(), Encoding.UTF8));
-                        
-                        builder.Clear();
+                        sourceProductionContext.AddSource($"{interfaceName}.g.cs", SourceText.From(writer.ToString(), Encoding.UTF8));
+                        writer.Clear();
                         
                     }
-                    
-
 
                 });
         }
@@ -95,29 +165,5 @@ namespace DataClassGenerator
             return nativeTypes.Contains(field);
         }
         
-        static void SetAttribute(IncrementalGeneratorPostInitializationContext context)
-        {
-            const string AttributeText = @"
-using System;
-namespace SourceGeneratorSample
-{
-    [AttributeUsage(AttributeTargets.Class,
-                    Inherited = false, AllowMultiple = false)]
-        sealed class SampleAttribute : Attribute
-    {
-    
-        public SampleAttribute()
-        {   
-        }
-        
-    }
-}
-";                
-            context.AddSource
-            (
-                "SampleAttribute.cs",
-                SourceText.From(AttributeText,Encoding.UTF8)
-            );
-        }
     }
 }
