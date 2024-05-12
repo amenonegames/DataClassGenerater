@@ -1,6 +1,8 @@
 ﻿
+using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace DataClassGenerator;
@@ -44,7 +46,7 @@ public class ConfigData
             string cleanedJsonObject = jsonObject.Trim().TrimStart('{').TrimEnd('}');
 
             // キーと値のペアを解析
-            var matches = Regex.Matches(cleanedJsonObject, "\"(.*?)\"\\s*:\\s*(true|false|\".*?\"|[\\d]+)");
+            var matches = Regex.Matches(cleanedJsonObject, "\"(.*?)\"\\s*:\\s*(true|false|\".*?\"|[\\d]+|\\[.*\\])",RegexOptions.Singleline);
             foreach (Match match in matches)
             {
                 string key = match.Groups[1].Value;
@@ -70,6 +72,11 @@ public class ConfigData
                     case "InterfaceName":
                         target.InterfaceName = value;
                         break;
+                    case "Usings":
+                        string arrayStr = value.Trim().Trim(' ', '\n', '\t', '[', ']');
+                        string[] rawArrayStr = arrayStr.Split(',');
+                        target.Usings = rawArrayStr.Select( str => str.Trim(' ', '\r','\n', '\t','"')).ToArray();
+                        break;
                 }
             }
             targets.Add(target);
@@ -81,10 +88,11 @@ public class ConfigData
 
 internal class Target
 {
-    public string RootPath { get; set; }
-    public char CSVSeparator { get; set; }
-    public string NameSpace { get; set; }
+    public string RootPath { get; set; } = string.Empty;
+    public char CSVSeparator { get; set; } = ',';
+    public string NameSpace { get; set; } = string.Empty;
     public bool Serializable { get; set; }
     public bool InterfaceEnable { get; set; }
-    public string InterfaceName { get; set; }
+    public string InterfaceName { get; set; } = string.Empty;
+    public string[] Usings { get; set; } = Array.Empty<string>();
 } 

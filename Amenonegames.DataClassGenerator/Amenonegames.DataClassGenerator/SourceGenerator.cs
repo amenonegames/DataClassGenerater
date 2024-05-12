@@ -70,6 +70,12 @@ namespace DataClassGenerator
                         foreach (var csvInfo in groupedCsvData)
                         {
                             if(!csvInfo.settingExist) continue;
+
+                            foreach (var usingStr in csvInfo.usings)
+                            {
+                                if(string.IsNullOrEmpty(usingStr)) continue;
+                                writer.AppendLine($"using {usingStr};");
+                            }
                             
                             if (csvInfo.EnableNameSpace)
                             {
@@ -103,7 +109,7 @@ namespace DataClassGenerator
                                     writer.AppendLine($"get {{return _{propertyName};}} ");
                                     writer.AppendLine($"set {{_{propertyName} = value;}}"); 
                                     writer.EndBlock();
-                                    writer.AppendLine($"[SerializeField]");
+                                    writer.AppendLine($"[UnityEngine.SerializeField]");
                                     writer.AppendLine($"private {type} _{propertyName};");
                                 }
                                 else writer.AppendLine($"public {type} {propertyName} {{ get; set;}}");
@@ -131,6 +137,16 @@ namespace DataClassGenerator
                         var interfacePropertyName = groupedCsvData
                             .Select(info => info.PropertyInfos.AsEnumerable())
                             .Aggregate((current, next) => current.Intersect(next));
+                        
+                        var interfaceUsings = groupedCsvData
+                            .Select(info => info.usings.AsEnumerable())
+                            .Aggregate((current, next) => current.Union(next));
+
+                        foreach (var usingStr in interfaceUsings)
+                        {
+                            if(string.IsNullOrEmpty(usingStr)) continue;
+                            writer.AppendLine($"using {usingStr};");
+                        }
                         
                         if (csvInfoSample.EnableNameSpace)
                         {

@@ -13,6 +13,7 @@ public struct CsvInfo
     public readonly string interfaceName;
     public readonly string fileName;
     public readonly PropertyInfo[] PropertyInfos;
+    public readonly string[] usings;
     public readonly bool EnableNameSpace => !string.IsNullOrEmpty(nameSpace);
 
     public readonly bool settingExist = true;
@@ -34,6 +35,7 @@ public struct CsvInfo
             nameSpace = string.Empty;
             serializable = false;
             settingExist = false;
+            usings = new string[] { };
             return;
         }
 
@@ -67,6 +69,7 @@ public struct CsvInfo
         interfaceName = targetSetting?.InterfaceName ?? string.Empty;
         nameSpace = targetSetting?.NameSpace ?? string.Empty;
         serializable = targetSetting?.Serializable ?? false;
+        usings = targetSetting?.Usings ?? new string[] { };
         
     }
     
