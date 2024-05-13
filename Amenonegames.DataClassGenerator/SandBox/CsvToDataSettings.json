@@ -1,21 +1,24 @@
-[
-    {
-      "RootPath": "Amenonegames.DataClassGenerator/SandBox/CSV",
-      "CSVSeparator":",", 
-      "NameSpace": "Config",
-      "Serializable":false,
-      "InterfaceEnable": true,
-      "InterfaceName": "IConfig",
-      "Usings": [ "System", "System.Collections.Generic"  ]
-    },
-    {
-      "RootPath": "Amenonegames.DataClassGenerator/SandBox/CSVTest2",
-      "CSVSeparator":",", 
-      "NameSpace": "Config",
-      "Serializable":false,
-      "InterfaceEnable": true,
-      "InterfaceName": "IConfig2",
-      "Usings":[]
-    }
-]
-  
+{
+  "settings": 
+  [
+      {
+        "RootPath": "Amenonegames.DataClassGenerator/SandBox/CSV",
+        "CSVSeparator":",", 
+        "NameSpace": "Config",
+        "Serializable":false,
+        "InterfaceEnable": true,
+        "InterfaceName": "IConfig",
+        "Usings": [ "System", "System.Collections.Generic"  ]
+      },
+      {
+        "RootPath": "Amenonegames.DataClassGenerator/SandBox/CSVTest2",
+        "CSVSeparator":",", 
+        "NameSpace": "Config",
+        "Serializable":false,
+        "InterfaceEnable": true,
+        "InterfaceName": "IConfig2",
+        "Usings":[]
+      }
+  ]
+
+}

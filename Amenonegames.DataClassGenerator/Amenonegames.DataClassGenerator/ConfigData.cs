@@ -33,9 +33,11 @@ public class ConfigData
     private List<Target> ParseJson(string json)
     {
         List<Target> targets = new List<Target>();
-
+        
+        string caretTrim = json.Trim().TrimStart('{').TrimEnd('}');
+        string settingsTrim = RemovePrefix(caretTrim, "\"settings\":");
         // 外側の配列の括弧を取り除く
-        string trimmedJson = json.Trim().TrimStart('[').TrimEnd(']');
+        string trimmedJson = settingsTrim.Trim().TrimStart('[').TrimEnd(']');
 
         // 個々のオブジェクトに分割
         string[] jsonObjects = Regex.Split(trimmedJson, @"}\s*,\s*{");
@@ -83,6 +85,22 @@ public class ConfigData
         }
 
         return targets;
+    }
+    
+    private static string RemovePrefix(string input, string prefix)
+    {
+        // Trim() を使って文頭の空白を削除
+        string trimmedInput = input.Trim();
+        
+        // 文頭に prefix があるかどうか確認
+        if (trimmedInput.StartsWith(prefix))
+        {
+            // prefix の長さ分だけ文字列を削除
+            return trimmedInput.Substring(prefix.Length).TrimStart();
+        }
+        
+        // prefix がなければ、元の文字列をそのまま返す
+        return input;
     }
 }
 
