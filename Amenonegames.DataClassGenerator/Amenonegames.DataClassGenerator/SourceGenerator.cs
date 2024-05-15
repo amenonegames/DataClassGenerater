@@ -5,6 +5,7 @@ using System.Text;
 using Amenonegames.SourceGenerator;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.DotnetRuntime.Extensions;
 using Microsoft.CodeAnalysis.Text;
 
@@ -16,6 +17,7 @@ namespace DataClassGenerator
 
         public void Initialize(IncrementalGeneratorInitializationContext context)
         {
+            var compilation = context.CompilationProvider;
             
 
             IncrementalValueProvider<ConfigData> configDataProvider = context.AdditionalTextsProvider.Where
@@ -54,16 +56,22 @@ namespace DataClassGenerator
                 .Select
                 (
                     static (data,token) => new CsvInfo(data.Left,data.Right) 
-                ).Collect();
+                ).Collect().Combine(compilation);
             
             
             context.RegisterSourceOutput(
                 dataProvider,
-                static (sourceProductionContext, csvDataArray) =>
+                static (sourceProductionContext, data) =>
                 {
                     try
                     {
                         var writer = new CodeWriter();
+
+                        var ( csvDataArray, compilation) = data;
+
+                        var classSymbol =compilation.GetTypeByMetadataName(
+                            "Amenone.DataClassGenerator.Runtime.CompilationFlagForDataClassGenerate");
+                        if (classSymbol == null) return;
                         
                         var interfaceGrouped = csvDataArray.GroupBy( csvData => csvData.interfaceName);
                         
