@@ -2,7 +2,7 @@
   "settings": 
   [
       {
-        "RootPath": "Amenonegames.DataClassGenerator/SandBox/CSV",
+        "FilePath": "Amenonegames.DataClassGenerator/SandBox/CSV/TestMasterData.csv",
         "CSVSeparator":",", 
         "NameSpace": "Config",
         "Serializable":false,
@@ -11,7 +11,7 @@
         "Usings": [ "System", "System.Collections.Generic"  ]
       },
       {
-        "RootPath": "Amenonegames.DataClassGenerator/SandBox/CSVTest2",
+        "FilePath": "Amenonegames.DataClassGenerator/SandBox/CSVTest2/MasterData.csv",
         "CSVSeparator":",", 
         "NameSpace": "Config",
         "Serializable":false,
@@ -22,3 +22,4 @@
   ]
 
 }
+

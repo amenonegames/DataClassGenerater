@@ -61,115 +61,168 @@ namespace DataClassGenerator
                 dataProvider,
                 static (sourceProductionContext, csvDataArray) =>
                 {
-                    var writer = new CodeWriter();
-                    
-                    var interfaceGrouped = csvDataArray.GroupBy( csvData => csvData.interfaceName);
-                    
-                    foreach (var groupedCsvData in interfaceGrouped)
+                    try
                     {
-                        foreach (var csvInfo in groupedCsvData)
+                        var writer = new CodeWriter();
+                        
+                        var interfaceGrouped = csvDataArray.GroupBy( csvData => csvData.interfaceName);
+                        
+                        foreach (var groupedCsvData in interfaceGrouped)
                         {
-                            if(!csvInfo.settingExist) continue;
+                            foreach (var csvInfo in groupedCsvData)
+                            {
+                                if (!csvInfo.settingExist)
+                                {
+                                    var diagnostic = Diagnostic.Create(new DiagnosticDescriptor(
+                                        "SGCSVD001", "Error Generation : Config not found", "Error ", "SourceGenerator", 
+                                        DiagnosticSeverity.Error, true),
+                                        Location.None,
+                                        additionalLocations: null);
 
-                            foreach (var usingStr in csvInfo.usings)
+                                    sourceProductionContext.ReportDiagnostic(diagnostic);
+                                    return;
+                                }
+
+                                if (string.IsNullOrEmpty(csvInfo.fileName) )
+                                {
+                                    var diagnostic = Diagnostic.Create(new DiagnosticDescriptor(
+                                            "SGCSVD002", "Error Generation : fileName is Empty", "Error ", "SourceGenerator", 
+                                            DiagnosticSeverity.Error, true),
+                                        Location.None,
+                                        additionalLocations: null);
+
+                                    sourceProductionContext.ReportDiagnostic(diagnostic);
+                                    return;
+                                }
+
+                                foreach (var usingStr in csvInfo.usings)
+                                {
+                                    if(string.IsNullOrEmpty(usingStr)) continue;
+                                    writer.AppendLine($"using {usingStr};");
+                                }
+                                
+                                if (csvInfo.EnableNameSpace)
+                                {
+                                    writer.AppendLine($"namespace {csvInfo.nameSpace}");
+                                    writer.BeginBlock();
+                                }
+
+                                if (csvInfo.serializable)
+                                {
+                                    writer.AppendLine($"[System.Serializable]");
+                                }
+                                writer.AppendLine( $"public partial class {csvInfo.fileName}" );
+
+                                if (csvInfo.requiredInterface)
+                                {
+                                    writer.Append($": {csvInfo.interfaceName}");
+                                }
+                                
+                                writer.AppendLine();
+                                writer.BeginBlock();
+                                    
+                                for (var i = 0; i < csvInfo.PropertyInfos.Length; i++)
+                                {
+                                    var propertyName = csvInfo.PropertyInfos[i].PropertyName;
+                                    var type = csvInfo.PropertyInfos[i].TypeName;
+                                    
+                                    if (csvInfo.serializable)
+                                    {
+                                        writer.AppendLine($"public {type} {propertyName} ");
+                                        writer.BeginBlock();
+                                        writer.AppendLine($"get {{return _{propertyName};}} ");
+                                        writer.AppendLine($"set {{_{propertyName} = value;}}"); 
+                                        writer.EndBlock();
+                                        writer.AppendLine($"[UnityEngine.SerializeField]");
+                                        writer.AppendLine($"private {type} _{propertyName};");
+                                    }
+                                    else writer.AppendLine($"public {type} {propertyName} {{ get; set;}}");
+                                    
+                                }
+                                
+                                writer.EndBlock();
+                                
+                                if (csvInfo.EnableNameSpace)
+                                {
+                                    writer.EndBlock();
+                                }
+                                
+                                sourceProductionContext.AddSource($"{csvInfo.fileName}.g.cs", SourceText.From(writer.ToString(), Encoding.UTF8));
+                                writer.Clear();
+                            }
+
+                            var interfaceName = groupedCsvData.Key;
+                            if(interfaceName == string.Empty) continue;
+                            
+                            var csvInfoSample = groupedCsvData.First();
+                            if( !csvInfoSample.requiredInterface) continue;  
+                            if( csvInfoSample.settingExist == false) continue;
+
+                            var prevCsv = groupedCsvData.First();
+                            foreach (var csv in groupedCsvData)
+                            {
+                                if (!csv.PropertiesEquals(prevCsv))
+                                {
+                                    var diagnostic = Diagnostic.Create(new DiagnosticDescriptor(
+                                            "SGCSVD003", $"Error Generation : Interface members are not match between {csv.fileName} and {prevCsv.fileName}", "Warning ", "SourceGenerator", 
+                                            DiagnosticSeverity.Warning, true),
+                                        Location.None,
+                                        additionalLocations: null);
+
+                                    sourceProductionContext.ReportDiagnostic(diagnostic);
+                                    continue;
+                                }
+                            }
+                            
+                            var interfacePropertyName = groupedCsvData
+                                .Select(info => info.PropertyInfos.AsEnumerable())
+                                .Aggregate((current, next) => current.Intersect(next));
+                            
+                            var interfaceUsings = groupedCsvData
+                                .Select(info => info.usings.AsEnumerable())
+                                .Aggregate((current, next) => current.Union(next));
+
+                            foreach (var usingStr in interfaceUsings)
                             {
                                 if(string.IsNullOrEmpty(usingStr)) continue;
                                 writer.AppendLine($"using {usingStr};");
                             }
                             
-                            if (csvInfo.EnableNameSpace)
+                            if (csvInfoSample.EnableNameSpace)
                             {
-                                writer.AppendLine($"namespace {csvInfo.nameSpace}");
+                                writer.AppendLine($"namespace {csvInfoSample.nameSpace}");
                                 writer.BeginBlock();
                             }
-
-                            if (csvInfo.serializable)
-                            {
-                                writer.AppendLine($"[System.Serializable]");
-                            }
-                            writer.AppendLine( $"public partial class {csvInfo.fileName}" );
-
-                            if (csvInfo.requiredInterface)
-                            {
-                                writer.Append($": {csvInfo.interfaceName}");
-                            }
-                            
-                            writer.AppendLine();
+                            writer.AppendLine( $"public partial interface {interfaceName}" );
                             writer.BeginBlock();
-                                
-                            for (var i = 0; i < csvInfo.PropertyInfos.Length; i++)
-                            {
-                                var propertyName = csvInfo.PropertyInfos[i].PropertyName;
-                                var type = csvInfo.PropertyInfos[i].TypeName;
-                                
-                                if (csvInfo.serializable)
-                                {
-                                    writer.AppendLine($"public {type} {propertyName} ");
-                                    writer.BeginBlock();
-                                    writer.AppendLine($"get {{return _{propertyName};}} ");
-                                    writer.AppendLine($"set {{_{propertyName} = value;}}"); 
-                                    writer.EndBlock();
-                                    writer.AppendLine($"[UnityEngine.SerializeField]");
-                                    writer.AppendLine($"private {type} _{propertyName};");
-                                }
-                                else writer.AppendLine($"public {type} {propertyName} {{ get; set;}}");
-                                
-                            }
                             
+                            foreach (var propertyInfo in interfacePropertyName)
+                            {
+                                writer.AppendLine($"{propertyInfo.TypeName} {propertyInfo.PropertyName} {{ get; set;}}");
+                            }
                             writer.EndBlock();
                             
-                            if (csvInfo.EnableNameSpace)
+                            if (csvInfoSample.EnableNameSpace)
                             {
                                 writer.EndBlock();
                             }
                             
-                            sourceProductionContext.AddSource($"{csvInfo.fileName}.g.cs", SourceText.From(writer.ToString(), Encoding.UTF8));
+                            sourceProductionContext.AddSource($"{interfaceName}.g.cs", SourceText.From(writer.ToString(), Encoding.UTF8));
                             writer.Clear();
+                            
                         }
 
-                        var interfaceName = groupedCsvData.Key;
-                        if(interfaceName == string.Empty) continue;
-                        
-                        var csvInfoSample = groupedCsvData.First();
-                        if( !csvInfoSample.requiredInterface) continue;  
-                        if( csvInfoSample.settingExist == false) continue;
-                        
-                        var interfacePropertyName = groupedCsvData
-                            .Select(info => info.PropertyInfos.AsEnumerable())
-                            .Aggregate((current, next) => current.Intersect(next));
-                        
-                        var interfaceUsings = groupedCsvData
-                            .Select(info => info.usings.AsEnumerable())
-                            .Aggregate((current, next) => current.Union(next));
+                    }
+                    catch (Exception e)
+                    {
+                        var diagnostic = Diagnostic.Create(new DiagnosticDescriptor(
+                                "SGCSVD000", $"Error Generation : Unknown Error {e.ToString()}", "Error ", "SourceGenerator", 
+                                DiagnosticSeverity.Error, true),
+                            Location.None,
+                            additionalLocations: null);
 
-                        foreach (var usingStr in interfaceUsings)
-                        {
-                            if(string.IsNullOrEmpty(usingStr)) continue;
-                            writer.AppendLine($"using {usingStr};");
-                        }
-                        
-                        if (csvInfoSample.EnableNameSpace)
-                        {
-                            writer.AppendLine($"namespace {csvInfoSample.nameSpace}");
-                            writer.BeginBlock();
-                        }
-                        writer.AppendLine( $"public partial interface {interfaceName}" );
-                        writer.BeginBlock();
-                        
-                        foreach (var propertyInfo in interfacePropertyName)
-                        {
-                            writer.AppendLine($"{propertyInfo.TypeName} {propertyInfo.PropertyName} {{ get; set;}}");
-                        }
-                        writer.EndBlock();
-                        
-                        if (csvInfoSample.EnableNameSpace)
-                        {
-                            writer.EndBlock();
-                        }
-                        
-                        sourceProductionContext.AddSource($"{interfaceName}.g.cs", SourceText.From(writer.ToString(), Encoding.UTF8));
-                        writer.Clear();
-                        
+                        sourceProductionContext.ReportDiagnostic(diagnostic);
+                        return;
                     }
 
                 });

@@ -56,7 +56,7 @@ public class ConfigData
 
                 switch (key)
                 {
-                    case "RootPath":
+                    case "FilePath":
                         target.RootPath = value;
                         break;
                     case "CSVSeparator":  // 修正したCSVSeparatorのスペルミス

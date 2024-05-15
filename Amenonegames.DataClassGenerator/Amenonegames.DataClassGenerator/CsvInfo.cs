@@ -5,7 +5,7 @@ using Microsoft.CodeAnalysis;
 
 namespace DataClassGenerator;
 
-public struct CsvInfo
+public struct CsvInfo : IEquatable<CsvInfo> 
 {
     public readonly bool requiredInterface;
     public readonly bool serializable;
@@ -107,6 +107,36 @@ public struct CsvInfo
     }
 
 
+    public bool Equals(CsvInfo other)
+    {
+        return requiredInterface == other.requiredInterface && serializable == other.serializable && nameSpace == other.nameSpace && interfaceName == other.interfaceName && fileName == other.fileName && PropertyInfos.Equals(other.PropertyInfos) && usings.Equals(other.usings) && settingExist == other.settingExist;
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is CsvInfo other && Equals(other);
+    }
+    
+    public bool PropertiesEquals(CsvInfo other)
+    {
+        return PropertyInfos.SequenceEqual(other.PropertyInfos);
+    }
+
+    public override int GetHashCode()
+    {
+        unchecked
+        {
+            var hashCode = requiredInterface.GetHashCode();
+            hashCode = (hashCode * 397) ^ serializable.GetHashCode();
+            hashCode = (hashCode * 397) ^ nameSpace.GetHashCode();
+            hashCode = (hashCode * 397) ^ interfaceName.GetHashCode();
+            hashCode = (hashCode * 397) ^ fileName.GetHashCode();
+            hashCode = (hashCode * 397) ^ PropertyInfos.GetHashCode();
+            hashCode = (hashCode * 397) ^ usings.GetHashCode();
+            hashCode = (hashCode * 397) ^ settingExist.GetHashCode();
+            return hashCode;
+        }
+    }
 }
 
 
