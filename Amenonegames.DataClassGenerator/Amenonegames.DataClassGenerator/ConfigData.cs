@@ -35,7 +35,7 @@ public class ConfigData
         List<Target> targets = new List<Target>();
         
         string caretTrim = json.Trim().TrimStart('{').TrimEnd('}');
-        string settingsTrim = RemovePrefix(caretTrim, "\"settings\":");
+        string settingsTrim = RemovePrefix(caretTrim, "\"Settings\":");
         // 外側の配列の括弧を取り除く
         string trimmedJson = settingsTrim.Trim().TrimStart('[').TrimEnd(']');
 

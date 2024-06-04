@@ -8,3 +8,4 @@ C:\Users\tamed\Documents\project\DataClassGenerater\Amenonegames.DataClassGenera
 C:\Users\tamed\Documents\project\DataClassGenerater\Amenonegames.DataClassGenerator\SandBox\bin\Release\netstandard2.0\SandBox.pdb
 C:\Users\tamed\Documents\project\DataClassGenerater\Amenonegames.DataClassGenerator\SandBox\obj\Release\netstandard2.0\SandBox.dll
 C:\Users\tamed\Documents\project\DataClassGenerater\Amenonegames.DataClassGenerator\SandBox\obj\Release\netstandard2.0\SandBox.pdb
+C:\Users\tamed\Documents\project\DataClassGenerater\Amenonegames.DataClassGenerator\SandBox\obj\Release\netstandard2.0\SandBox.sourcelink.json
