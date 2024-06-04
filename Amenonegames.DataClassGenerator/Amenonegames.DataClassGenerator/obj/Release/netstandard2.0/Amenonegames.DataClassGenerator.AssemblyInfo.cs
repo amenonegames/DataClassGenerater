@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Amenonegames.DataClassGenerator")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+996d68edc5bcf90b0c6ea250de3868d7dd683f95")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+42dc39dcf6bb460087d74728c1d264c517a64af2")]
 [assembly: System.Reflection.AssemblyProductAttribute("Amenonegames.DataClassGenerator")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Amenonegames.DataClassGenerator")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
