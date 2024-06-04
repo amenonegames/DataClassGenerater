@@ -56,6 +56,9 @@ public class ConfigData
 
                 switch (key)
                 {
+                    case "AssemblyName":
+                        target.AssemblyName = value;
+                        break;
                     case "FilePath":
                         target.RootPath = value;
                         break;
@@ -106,6 +109,7 @@ public class ConfigData
 
 internal class Target
 {
+    public string AssemblyName { get; set; } = string.Empty;
     public string RootPath { get; set; } = string.Empty;
     public char CSVSeparator { get; set; } = ',';
     public string NameSpace { get; set; } = string.Empty;

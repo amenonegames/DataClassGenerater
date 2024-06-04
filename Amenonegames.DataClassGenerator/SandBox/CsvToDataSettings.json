@@ -2,6 +2,7 @@
   "settings": 
   [
       {
+        "AssemblyName": "SandBox",
         "FilePath": "Amenonegames.DataClassGenerator/SandBox/CSV/TestMasterData.csv",
         "CSVSeparator":",", 
         "NameSpace": "Config",
@@ -11,6 +12,7 @@
         "Usings": [ "System", "System.Collections.Generic"  ]
       },
       {
+        "AssemblyName": "SandBox",
         "FilePath": "Amenonegames.DataClassGenerator/SandBox/CSVTest2/MasterData.csv",
         "CSVSeparator":",", 
         "NameSpace": "Config",

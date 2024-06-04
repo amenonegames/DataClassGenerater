@@ -68,10 +68,6 @@ namespace DataClassGenerator
                         var writer = new CodeWriter();
 
                         var ( csvDataArray, compilation) = data;
-
-                        var classSymbol =compilation.GetTypeByMetadataName(
-                            "Amenone.DataClassGenerator.Runtime.CompilationFlagForDataClassGenerate");
-                        if (classSymbol == null) return;
                         
                         var interfaceGrouped = csvDataArray.GroupBy( csvData => csvData.interfaceName);
                         
@@ -90,6 +86,8 @@ namespace DataClassGenerator
                                     sourceProductionContext.ReportDiagnostic(diagnostic);
                                     return;
                                 }
+                                
+                                if (compilation.AssemblyName != csvInfo.assemblyName) continue;
 
                                 if (string.IsNullOrEmpty(csvInfo.fileName) )
                                 {

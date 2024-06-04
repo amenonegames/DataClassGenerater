@@ -9,6 +9,7 @@ public struct CsvInfo : IEquatable<CsvInfo>
 {
     public readonly bool requiredInterface;
     public readonly bool serializable;
+    public readonly string assemblyName;
     public readonly string nameSpace;
     public readonly string interfaceName;
     public readonly string fileName;
@@ -30,6 +31,7 @@ public struct CsvInfo : IEquatable<CsvInfo>
         if( targetSetting == null)
         {
             PropertyInfos = new PropertyInfo[] { }; 
+            assemblyName = string.Empty;
             requiredInterface = false;
             interfaceName = string.Empty;
             nameSpace = string.Empty;
@@ -65,6 +67,7 @@ public struct CsvInfo : IEquatable<CsvInfo>
             PropertyInfos = new PropertyInfo[] { }; 
         }
 
+        assemblyName = targetSetting?.AssemblyName ?? string.Empty;
         requiredInterface = targetSetting?.InterfaceEnable ?? false;
         interfaceName = targetSetting?.InterfaceName ?? string.Empty;
         nameSpace = targetSetting?.NameSpace ?? string.Empty;
